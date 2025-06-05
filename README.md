@@ -48,6 +48,9 @@ Your work will be automatically submitted when you push to your GitHub Classroom
 
 
 
+## Solutions
+
+
 📚 MongoDB Bookstore Project
 This project is a simple MongoDB-based book database that demonstrates core CRUD operations, indexing for performance, and aggregations such as grouping books by decade.
 

@@ -11,28 +11,51 @@ async function runQueries() {
     const db = client.db(dbName);
     const collection = db.collection(collectionName);
 
-    // 1. Find all books in a specific genre (e.g., Fiction)
+    // Index for performance
+    await collection.createIndex({ published_year: 1 });
+    await collection.createIndex({ genre: 1, author: 1 });
+
+    // Find books in a specific genre
     const fictionBooks = await collection.find({ genre: "Fiction" }).toArray();
     console.log('Books in Fiction genre:', fictionBooks);
 
-    // 2. Find books published after 2000
+    // Find books published after 2000
     const recentBooks = await collection.find({ published_year: { $gt: 2000 } }).toArray();
     console.log('Books published after 2000:', recentBooks);
 
-    // 3. Find books by a specific author
+    // Find books by George Orwell
     const orwellBooks = await collection.find({ author: "George Orwell" }).toArray();
     console.log('Books by George Orwell:', orwellBooks);
 
-    // 4. Update price of a specific book
+    // Update price of 1984
     const updateResult = await collection.updateOne(
       { title: "1984" },
       { $set: { price: 12.99 } }
     );
     console.log('Update result:', updateResult.modifiedCount);
 
-    // 5. Delete a book by title
+    // Delete a book by title
     const deleteResult = await collection.deleteOne({ title: "Moby Dick" });
     console.log('Delete result:', deleteResult.deletedCount);
+
+    // Group books by decade
+    const booksByDecade = await collection.aggregate([
+      {
+        $group: {
+          _id: {
+            $concat: [
+              { $substr: [{ $subtract: ["$published_year", { $mod: ["$published_year", 10] }] }, 0, 4] },
+              "s"
+            ]
+          },
+          count: { $sum: 1 },
+          books: { $push: "$title" }
+        }
+      },
+      { $sort: { _id: 1 } }
+    ]).toArray();
+
+    console.log('Books grouped by decade:', booksByDecade);
 
   } catch (error) {
     console.error(error);

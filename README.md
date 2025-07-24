@@ -43,5 +43,106 @@ Your work will be automatically submitted when you push to your GitHub Classroom
 ## Resources
 
 - [MongoDB Documentation](https://docs.mongodb.com/)
-- [MongoDB University](https://university.mongodb.com/)
-- [MongoDB Node.js Driver](https://mongodb.github.io/node-mongodb-native/) 
+- [MongoDB University](https://university.mongodb.co
+- [MongoDB Node.js Driver](https://mongodb.github.io/node-mongodb-native/)
+
+
+
+## Solutions
+
+
+📚 MongoDB Bookstore Project
+This project is a simple MongoDB-based book database that demonstrates core CRUD operations, indexing for performance, and aggregations such as grouping books by decade.
+
+🛠️ Technologies Used
+MongoDB (using MongoDB Compass GUI)
+
+Node.js + mongodb driver
+
+Mongo Shell & Aggregation Pipelines
+
+📁 Database Structure
+Database: plp_bookstore
+
+Collection: books
+
+Each document in the books collection includes:
+
+json
+Copy
+Edit
+{
+  "title": "The Alchemist",
+  "author": "Paulo Coelho",
+  "genre": "Fiction",
+  "published_year": 1988,
+  "price": 10.99,
+  "in_stock": true,
+  "pages": 197,
+  "publisher": "HarperOne"
+}
+✅ Features Implemented
+1. Indexing for Performance
+js
+Copy
+Edit
+await collection.createIndex({ published_year: 1 });
+await collection.createIndex({ genre: 1, author: 1 });
+2. Sample Queries
+js
+Copy
+Edit
+// Find books in Fiction genre
+collection.find({ genre: "Fiction" })
+
+// Books published after 2000
+collection.find({ published_year: { $gt: 2000 } })
+
+// Update a book's price
+collection.updateOne({ title: "1984" }, { $set: { price: 12.99 } })
+
+// Delete a book
+collection.deleteOne({ title: "Moby Dick" })
+3. Group Books by Decade
+js
+Copy
+Edit
+collection.aggregate([
+  {
+    $group: {
+      _id: {
+        $concat: [
+          { $substr: [{ $subtract: ["$published_year", { $mod: ["$published_year", 10] }] }, 0, 4] },
+          "s"
+        ]
+      },
+      count: { $sum: 1 },
+      books: { $push: "$title" }
+    }
+  },
+  { $sort: { _id: 1 } }
+])
+📸 MongoDB Compass Screenshot
+Below is a visual view of the book collection using MongoDB Compass:
+
+![Mongod compass screenshot](https://github.com/user-attachments/assets/c895f91a-3f8b-4210-a8ce-f9fa0b569e30)
+
+
+🔄 How to Run
+Make sure MongoDB is running locally at mongodb://localhost:27017
+
+Import data into the plp_bookstore database (manually via Compass or script).
+
+Run the Node.js script to interact with the database:
+
+bash
+Copy
+Edit
+node runQueries.js
+💡 Future Improvements
+Add user authentication for secure access
+
+Implement REST API using Express.js
+
+Add pagination and sorting features
+
